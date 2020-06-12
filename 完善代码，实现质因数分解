@@ -1,0 +1,70 @@
+【问题描述】
+阅读程序，并完善代码，实现下述功能：
+先读入一个正整数 N，对其做质因数分解，然后将质因数从小到大依次输出。
+例如：
+90 = 2 * 3 * 3 * 5
+请根据给出的代码，完善函数。
+【输入形式】
+•输入一个正整数 N(2<=N<=65535)。
+
+【输出形式】
+
+•分解得到的所有质因数，从小到大排列，以空格分隔，最后一个因数后无空格。
+•如果N本身为质数，则输出N本身。
+【样例输入1】
+2
+【样例输出1】
+2
+【样例输入1】
+90
+【样例输出1】
+2 3 3 5
+【样例输入1】
+1024
+【样例输出1】
+2 2 2 2 2 2 2 2 2 2
+
+
+#include<iostream>
+#include<cmath>
+using namespace std;
+int isPrime(long num)
+{
+	int i;
+	for(i=2;i<=sqrt(num);i++)
+		if(num%i==0) return 0;
+	return 1;
+}
+void factorization(long n,long a[],int &m)
+{
+	int i=3;
+	if(isPrime(n)) a[m++]=n;
+	else
+	{	
+		while(n%2==0&&n!=1) {a[m++]=2;n=n/2;}
+		while(n!=1)
+		{	
+			if(n%i==0) a[m++]=i;
+			else
+			{	while(1)
+				{
+				i=i+2;
+				if(isPrime(i)&&n%i==0) {a[m++]=i;break;}
+				}
+			}
+			n=n/i;	
+		}
+	}
+}
+int main()
+{
+	long n;
+	long factor[100];
+	int numofFactor=0;
+	cin>>n;
+	factorization(n,factor,numofFactor);
+	for(int i=0;i<numofFactor;i++)
+	{
+		cout<<factor[i]<<" ";
+	}
+}
