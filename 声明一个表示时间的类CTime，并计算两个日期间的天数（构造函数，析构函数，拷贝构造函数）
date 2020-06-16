@@ -1,0 +1,265 @@
+【问题描述】声明一个表示时间的类CTime，可以精确表示年、月、日、小时、分、秒，请计算两个日期对象之间相隔的天数。
+
+要求：
+1、包括私有成员年、月、日、小时、分、秒。
+2、请使用构造函数实现的类的初始化工作，并判断日期和时间的有效性。年月日时分秒应该在正确的范围内。考虑闰年时候二月份的情况。时间的格式是xx:xx:xx,小时不是超过23，分钟和秒不能超过59。
+      1）如果日期无效，则输出 “date error! ”  并将年、月、日、小时、分、秒置为0。
+      2）如果时间无效，则输出 “time error! ”  并将年、月、日、小时、分、秒置为0。
+      3）如果日期和时间都有效，则根据传递的参数初始化年、月、日、小时、分、秒。
+      4）构造函数的三个参数：小时、分、秒 设计为默认形成，其默认值为0。
+      5)  输出"构造函数被调用"
+3、请设计一个拷贝构造函数，实现将参数的值全部传递给当前对象，同时输出“拷贝构造函数被调用”
+4、请设计一个析构函数，同时输出“析构函数被调用”
+5、设计一个成员函数  int dayDiff(CTime t) ，用于计算当前对象与形参t之间的相隔的天数，注意相隔天数为大于等于0的正整数。注意闰年的问题。
+6、设计一个成员函数 showTime()，用于显示日期，显示格式为：2020/3/12 11:50:20
+
+提示：除了上传要求的成员函数外，你可以自由添加需要的成员函数。
+main函数已经给定，请补全其他代码。
+
+【样例输入1】
+2020 3 12 11 50 20
+【样例输出1】
+构造函数被调用
+2020/3/12 11:50:20
+构造函数被调用
+拷贝构造函数被调用
+析构函数被调用
+这两天之间相隔了7376天
+拷贝构造函数被调用
+析构函数被调用
+这两天之间相隔了7376天
+析构函数被调用
+析构函数被调用
+
+【样例输入2】
+2100 2 29 10 29 59
+【样例输出2】
+date error!
+构造函数被调用
+0/0/0 0:0:0
+构造函数被调用
+析构函数被调用
+析构函数被调用
+
+【样例输入3】
+2000 2 29 15 79 40
+【样例输出3】
+time error!
+构造函数被调用
+0/0/0 0:0:0
+构造函数被调用
+析构函数被调用
+析构函数被调用
+
+【样例输入4】
+2007 9 31 12 89 89
+【样例输出4】
+date and time error!
+构造函数被调用
+0/0/0 0:0:0
+构造函数被调用
+析构函数被调用
+析构函数被调用
+#include<iostream>
+#include<cmath>
+using namespace std;
+
+//填空部分开始
+class CTime
+{
+	public:
+		CTime(int  year,int month,int day,int hour=0,int minute=0,int second=0);//判断并且给成员变量赋初值// 
+		CTime(CTime& p);//拷贝构造函数// 
+		~CTime();//析构函数// 
+		int dayDiff(CTime t);//计算日期差// 
+		void showTime();//显示时间// 
+		int isvalid();//判断日期和时间是否合法// 
+	private:
+		int  Nflag,Nyear,Nmonth,Nday,Nhour,Nminute,Nsecond;//Nflag用来标记日期和时间的合法性状态// 
+};
+
+CTime::CTime(int  year,int month,int day,int hour,int minute,int second)
+{
+	int mflag=0,hflag=0;//mflag标记日期合法性，hflag标记时间合法性// 
+	switch(month)
+	{
+		case 1:case 3:case 5:case 7:case 8:case 10:
+		case 12:
+			if(day>31) mflag=1;break;
+		case 4:case 6:case 9:case 11:
+			if(day>30) mflag=1;break;
+		case 2:
+			if(year%400==0||(year%4==0&&year%100!=0))//闰年2月最多29天//
+				{if(day>29) mflag=1;break;}	
+			else//非闰年2月最多28天// 
+			  	{if(day>28) mflag=1;break;}
+	}
+	
+	if(hour>23||minute>59||second>59) hflag=2;
+	 
+	if(mflag!=0||hflag!=0) 
+	{
+		if(mflag!=0&&hflag==0)
+		cout<<"date error!"<<endl;
+		else if(mflag==0&&hflag!=0)
+		cout<<"time error!"<<endl;
+		else if(mflag!=0&&hflag!=0)
+		cout<<"date and time error!"<<endl;
+		Nyear=0;
+		Nmonth=0;
+		Nday=0;
+		Nhour=0;
+		Nminute=0;
+		Nsecond=0;
+		Nflag=1;	
+	}
+
+	else	
+	{
+	Nyear=year;
+	Nmonth=month;
+	Nday=day;
+	Nhour=hour;
+	Nminute=minute;
+	Nsecond=second;
+	Nflag=0;
+	}
+	
+	cout<<"构造函数被调用"<<endl; 
+}
+
+int CTime::isvalid()
+{
+	if(Nflag==0) return 1;
+	else return 0;
+}
+
+int CTime::dayDiff(CTime t)
+{
+	int i,sum=0,flag=0,maxyear,minyear;
+	
+	if(t.Nyear>this->Nyear) {maxyear=t.Nyear;minyear=this->Nyear;flag=1;}//找到最大年,保证日期差为自然数// 
+	else {maxyear=this->Nyear;minyear=t.Nyear;}
+	
+	for(i=minyear;i<maxyear;i++)
+		if(i%400==0||(i%4==0&&i%100!=0))	sum=sum+366;//判断范围年是否含闰年，并累加年天数// 
+		else sum=sum+365;
+	
+	if(flag==1)//用flag标记当前对象和形参对象年的大小关系// 
+	{
+		if(t.Nmonth>=this->Nmonth)
+		for(i=this->Nmonth;i<t.Nmonth;i++) //大年的月份比小年的大，就累加，反之，就累减// 
+		{
+			switch(i)
+			{
+			case 1:case 3:case 5:case 7:case 8:case 10:
+			case 12:
+				sum=sum+31;break;
+			case 4:case 6:case 9:case 11:
+				sum=sum+30;break;
+			case 2:
+				if((maxyear%400==0||(maxyear%4==0&&maxyear%100!=0))) sum=sum+29;break;
+				if((maxyear%400!=0||(maxyear%4!=0||maxyear%100==0))) sum=sum+28;break;
+			}		
+		}
+		else
+		{
+			for(i=this->Nmonth;i<t.Nmonth;i++)
+			{
+				switch(i)
+				{
+				case 1:case 3:case 5:case 7:case 8:case 10:
+				case 12:
+					sum=sum-31;break;
+				case 4:case 6:case 9:case 11:
+					sum=sum-30;break;
+				case 2:
+					if((maxyear%400==0||(maxyear%4==0&&maxyear%100!=0))) sum=sum-29;break;
+					if((maxyear%400!=0||(maxyear%4!=0||maxyear%100==0))) sum=sum-28;break;
+				}		
+			}
+		}
+	}
+	
+	else
+	{
+		if(this->Nmonth>=t.Nmonth)
+		for(i=t.Nmonth;i<this->Nmonth;i++)
+		{
+			switch(i)
+			{
+			case 1:case 3:case 5:case 7:case 8:case 10:
+			case 12:
+				sum=sum+31;break;
+			case 4:case 6:case 9:case 11:
+				sum=sum+30;break;
+			case 2:
+				if((maxyear%400==0||(maxyear%4==0&&maxyear%100!=0))) sum=sum+29;break;
+				if((maxyear%400!=0||(maxyear%4!=0||maxyear%100==0))) sum=sum+28;break;
+			}		
+		}
+		else
+		{
+			for(i=this->Nmonth;i<t.Nmonth;i++)
+			{
+			switch(i)
+			{
+			case 1:case 3:case 5:case 7:case 8:case 10:
+			case 12:
+				sum=sum-31;break;
+			case 4:case 6:case 9:case 11:
+				sum=sum-30;break;
+			case 2:
+				if((maxyear%400==0||(maxyear%4==0&&maxyear%100!=0))) sum=sum-29;break;
+				if((maxyear%400!=0||(maxyear%4!=0||maxyear%100==0))) sum=sum-28;break;
+			}		
+			}
+		}
+	}
+	
+	if(flag==1) sum=sum+t.Nday-this->Nday;//大年的日比小年的大，就累加，反之，就累减// 
+	else	sum=sum+this->Nday-t.Nday;
+	
+	return fabs(sum);
+}
+
+
+CTime::CTime(CTime& p)
+{
+	Nyear=p.Nyear;
+	Nmonth=p.Nmonth;
+	Nday=p.Nday;
+	Nhour=p.Nhour;
+	Nminute=p.Nminute;
+	Nsecond=p.Nsecond;
+	cout<<"拷贝构造函数被调用"<<endl;
+}
+
+CTime::~CTime()
+{
+	cout<<"析构函数被调用"<<endl;
+}
+
+void CTime::showTime() 
+{
+	cout<<Nyear<<"/"<<Nmonth<<"/"<<Nday<<" "<<Nhour<<":"<<Nminute<<":"<<Nsecond<<endl;
+}
+
+//填空部分结束
+int  main() 
+{ 
+        int  year,  month,  day,  hour,  minute,  second; 
+        cin  >>  year  >>  month  >>  day  >>  hour  >>  minute  >>  second; 
+        CTime  t1(year,  month,  day,  hour,  minute,  second); 
+        t1.showTime(); 
+        CTime  t2(2000,  1,  1);  //利用默认形参将时间初始化为00:00:00 
+        if  (t1.isvalid())          //如果日期和时间合法，则计算天数 
+        { 
+                int  days=0; 
+                days=t1.dayDiff(t2); 
+                cout  <<  "这两天之间相隔了"  <<  days  <<  "天"  <<  endl; 
+                days=t2.dayDiff(t1); 
+                cout  <<  "这两天之间相隔了"  <<  days  <<  "天"  <<  endl; 
+        } 
+}
+
